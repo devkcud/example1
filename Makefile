@@ -4,7 +4,7 @@ compile:
 	@cargo build -q --release
 
 try: compile
-	@./target/release/example1 ./examples/test
+	@./target/release/example1 ./samples/test.txt
 
 env_add: compile
 	sudo cp ./target/release/example1 /usr/local/bin
