@@ -14,16 +14,16 @@ fn main() {
         exit(1);
     }
 
-    let mut file = File::open(args.get(0).unwrap()).expect(format!("Error opening file: {}", args.get(0).unwrap()).as_str());
-    let mut data = String::new();
+    let mut file:   File = File::open(args.get(0).unwrap()).expect(format!("Error opening file: {}", args.get(0).unwrap()).as_str());
+    let mut data: String = String::new();
 
     file.read_to_string(&mut data).expect("Err");
 
     const ARRAY_SIZE: usize = 32;
-    const INDEX_MIN: usize  = 0;
-    const INDEX_MAX: usize  = ARRAY_SIZE - 1;
-    const BYTE_MIN: u16     = 0;
-    const BYTE_MAX: u16     = 255; // Hard limit because of limitations in my code and I am too lazy to create tests. My bad... Hours spent: 2
+    const INDEX_MIN:  usize = 0;
+    const INDEX_MAX:  usize = ARRAY_SIZE - 1;
+    const BYTE_MIN:     u16 = 0;
+    const BYTE_MAX:     u16 = 255; // Hard limit because of limitations in my code and I am too lazy to create tests. My bad... Hours spent: 2
 
     let arr:             [u16; ARRAY_SIZE] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     let mut byte_list:   [u16; ARRAY_SIZE] = arr;
@@ -59,7 +59,9 @@ fn main() {
 
             '~'  => arr.into_iter().enumerate().for_each(|(i, _c)| c_byte_list[i] = byte_list[INDEX_MAX - i]),
 
-            _    => (),
+            _    => {
+                ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].contains(&char).then(|| index = usize::try_from(char.to_digit(10).unwrap()).unwrap());
+            },
         }
     }
 }
