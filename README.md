@@ -40,7 +40,7 @@ cargo run -q -- ./examples/test
 ## Limitations
 
 - No spaces;
-  - Use "$@" to create spaces.
+  - Use "$=" to create spaces.
 - Limit of 32 chars;
 - Max 255 bytes for each index.
 
