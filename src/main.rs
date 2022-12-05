@@ -1,16 +1,11 @@
 use std::{fs::File, io::Read, env::{args, current_exe}, process::exit, path::Path};
 
-#[allow(unused_comparisons)]
 fn main() {
-    let mut index: usize = 0;
-    let mut byte_list: [u8; 16] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    let mut copy_byte_list: [u8; 16] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    
     let mut args: Vec<String> = args().collect();
     args.remove(0);
     
     if args.len() == 0 {
-        println!("usage: {} <file>", current_exe().unwrap().to_str().unwrap().split('/').collect::<Vec<&str>>().last().unwrap());
+        println!("Usage: {} <file>", current_exe().unwrap().to_str().unwrap().split('/').collect::<Vec<&str>>().last().unwrap());
         exit(1);
     }
     
@@ -23,60 +18,48 @@ fn main() {
     let mut data = String::new();
 
     file.read_to_string(&mut data).expect("Err");
-    let data = data.trim();
-    let data = data.replace(" ", "").replace("\n", "");
-    
-    for command in data.chars() {
-        match command {
-            '>' => {
-                if index < 15 {
-                    index += 1;
-                }
-            },
-            '<' => {
-                if index > 0 {
-                    index -= 1;
-                }
-            },
-            '+' => {
-                let add: u8 = 1;
 
-                byte_list[index] = byte_list[index].wrapping_add(add).min(127);
-            },
-            '-' => {
-                let rem: u8 = 1;
-                
-                byte_list[index] = byte_list[index].wrapping_sub(rem).min(0);
-            },
-            ']' => {
-                let add: u8 = 10;
+    const ARRAY_SIZE: usize = 32;
+    const INDEX_MIN: usize  = 0;
+    const INDEX_MAX: usize  = ARRAY_SIZE - 1;
+    const BYTE_MIN: u16     = 0;
+    const BYTE_MAX: u16     = 255;
 
-                byte_list[index] = byte_list[index].wrapping_add(add).min(127);
-            },
-            '[' => {
-                let rem: u8 = 10;
+    let arr:             [u16; ARRAY_SIZE] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let mut byte_list:   [u16; ARRAY_SIZE] = arr;
+    let mut c_byte_list: [u16; ARRAY_SIZE] = arr;
 
-                byte_list[index] = byte_list[index].wrapping_sub(rem).min(0);
-            },
-            ')' => {
-                let add: u8 = 100;
+    let mut index: usize = INDEX_MIN;
 
-                byte_list[index] = byte_list[index].wrapping_add(add).min(127);
-            },
-            '(' => {
-                let rem: u8 = 100;
-                
-                byte_list[index] = byte_list[index].wrapping_sub(rem).min(0);
-            },
-            '@' => println!("{}", String::from_utf8(byte_list.to_vec().clone()).unwrap()),
-            '#' => println!("{:?}", byte_list),
-            '!' => byte_list[index] = 0,
-            '~' => { byte_list.fill(0); index = 0; },
-            '?' => println!("{}", index),
-            '&' => println!("{}", byte_list[index]),
-            '*' => copy_byte_list = byte_list,
-            '/' => byte_list = copy_byte_list,
-            _ => (),
+    for char in data.chars().collect::<Vec<char>>() {
+        match char {
+            ')'  => byte_list[index] = byte_list[index].wrapping_add(  1).min(BYTE_MAX),
+            ']'  => byte_list[index] = byte_list[index].wrapping_add( 10).min(BYTE_MAX),
+            '}'  => byte_list[index] = byte_list[index].wrapping_add(100).min(BYTE_MAX),
+
+            '('  => byte_list[index] = byte_list[index].wrapping_sub(  1).max(BYTE_MIN),
+            '['  => byte_list[index] = byte_list[index].wrapping_sub( 10).max(BYTE_MIN),
+            '{'  => byte_list[index] = byte_list[index].wrapping_sub(100).max(BYTE_MIN),
+
+            '>'  => index = index.wrapping_add(1).min(INDEX_MAX),
+            '<'  => index = index.wrapping_sub(1).max(INDEX_MIN),
+
+            '\'' => c_byte_list.clone_from(&byte_list),
+            '"'  => byte_list.clone_from(&c_byte_list),
+
+            '='  => println!("{}", String::from_utf16(&byte_list).unwrap()),
+            '#'  => println!("{:?}", &byte_list),
+
+            '&'  => println!("{}", index), // Show index
+            '@'  => println!("{}", byte_list[index]), // Show hold value
+
+            '!'  => byte_list[index] = 0,
+            '$'  => byte_list.fill(0),
+            '.'  => index = 0,
+            
+            '~'  => arr.into_iter().enumerate().for_each(|(i, _c)| c_byte_list[i] = byte_list[INDEX_MAX - i]),
+
+            _    => (),
         }
     }
 }
