@@ -60,6 +60,7 @@ fn main() {
             '~'  => arr.into_iter().enumerate().for_each(|(i, _c)| c_byte_list[i] = byte_list[INDEX_MAX - i]),
 
             _    => {
+                // TODO: Make goto up to 31 (maximum)
                 ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].contains(&char).then(|| index = usize::try_from(char.to_digit(10).unwrap()).unwrap());
             },
         }
