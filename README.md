@@ -38,9 +38,9 @@ cargo run -q -- ./examples/test
 ## Limitations
 
 - No spaces;
-  - Use "~@" to create spaces.
-- Limit of 16 chars;
-- Max 127 "bytes" for each index.
+  - Use "$@" to create spaces.
+- Limit of 32 chars;
+- Max 255 bytes for each index.
 
 ## Commands
 
@@ -53,17 +53,21 @@ cargo run -q -- ./examples/test
 | -:      | :-
 | `>`     | Move the cursor to the next index
 | `<`     | Move the cursor to the previous index
-| `+`     | Add +1
+| `)`     | Add +1
 | `]`     | Add +10
-| `)`     | Add +100
-| `-`     | Remove -1
+| `}`     | Add +100
+| `(`     | Remove -1
 | `[`     | Remove -10
-| `(`     | Remove -100
+| `{`     | Remove -100
 | `!`     | Set value of the current index to 0
-| `~`     | Reset all values
-| `?`     | Get index
-| `&`     | Get value
+| `$`     | Reset all values
+| `&`     | Get index
+| `.`     | Set index to 0
+| `@`     | Get value
 | `#`     | Get list
-| `@`     | Get output
+| `=`     | Get output
+| `'`     | Copy the current list
+| `"`     | Use the copied list
+| `~`     | Reverse the list (need to be set again with `"`)
 
 > Everything else than those commands is considered a comment.
