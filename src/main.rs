@@ -3,7 +3,7 @@ use std::{fs::File, io::Read, env::{args, current_exe}, process::exit, path::Pat
 fn main() {
     let mut args: Vec<String> = args().collect();
     args.remove(0);
-    
+
     if args.len() == 0 {
         println!("Usage: {} <file>", current_exe().unwrap().to_str().unwrap().split('/').collect::<Vec<&str>>().last().unwrap());
         exit(1);
@@ -23,7 +23,7 @@ fn main() {
     const INDEX_MIN: usize  = 0;
     const INDEX_MAX: usize  = ARRAY_SIZE - 1;
     const BYTE_MIN: u16     = 0;
-    const BYTE_MAX: u16     = 255;
+    const BYTE_MAX: u16     = 255; // Hard limit because of limitations in my code and I am too lazy to create tests. My bad... Hours spent: 2
 
     let arr:             [u16; ARRAY_SIZE] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     let mut byte_list:   [u16; ARRAY_SIZE] = arr;
@@ -56,7 +56,7 @@ fn main() {
             '!'  => byte_list[index] = 0,
             '$'  => byte_list.fill(0),
             '.'  => index = 0,
-            
+
             '~'  => arr.into_iter().enumerate().for_each(|(i, _c)| c_byte_list[i] = byte_list[INDEX_MAX - i]),
 
             _    => (),
