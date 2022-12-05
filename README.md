@@ -20,10 +20,12 @@ _example1_ is a (esolang) parody of _brainfuck_ written in Rust. It will work in
 Just run:
 
 ```bash
-$ make
-$ make try # Will run an example
-Hey!
+$ make compile
+$ make try
+hey.
 ```
+
+> btw you can set it to your `/usr/local/bin` using `make env_add`
 
 ### Using cargo
 
