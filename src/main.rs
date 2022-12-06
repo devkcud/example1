@@ -31,38 +31,77 @@ fn main() {
 
     let mut index: usize = INDEX_MIN;
 
-    for char in data.chars().collect::<Vec<char>>() {
-        match char {
-            ')'  => byte_list[index] = byte_list[index].wrapping_add(  1).min(BYTE_MAX),
-            ']'  => byte_list[index] = byte_list[index].wrapping_add( 10).min(BYTE_MAX),
-            '}'  => byte_list[index] = byte_list[index].wrapping_add(100).min(BYTE_MAX),
+    for line in data.lines() {
+        for char in line.chars().collect::<Vec<char>>().iter() {
+            match char {
+                ')'  => byte_list[index] = byte_list[index].wrapping_add(  1).min(BYTE_MAX),
+                ']'  => byte_list[index] = byte_list[index].wrapping_add( 10).min(BYTE_MAX),
+                '}'  => byte_list[index] = byte_list[index].wrapping_add(100).min(BYTE_MAX),
 
-            '('  => byte_list[index] = byte_list[index].wrapping_sub(  1).max(BYTE_MIN),
-            '['  => byte_list[index] = byte_list[index].wrapping_sub( 10).max(BYTE_MIN),
-            '{'  => byte_list[index] = byte_list[index].wrapping_sub(100).max(BYTE_MIN),
+                '('  => byte_list[index] = byte_list[index].wrapping_sub(  1).max(BYTE_MIN),
+                '['  => byte_list[index] = byte_list[index].wrapping_sub( 10).max(BYTE_MIN),
+                '{'  => byte_list[index] = byte_list[index].wrapping_sub(100).max(BYTE_MIN),
 
-            '>'  => index = index.wrapping_add(1).min(INDEX_MAX),
-            '<'  => index = index.wrapping_sub(1).max(INDEX_MIN),
+                '>'  => index = index.wrapping_add(1).min(INDEX_MAX),
+                '<'  => index = index.wrapping_sub(1).max(INDEX_MIN),
 
-            '\'' => c_byte_list.clone_from(&byte_list),
-            '"'  => byte_list.clone_from(&c_byte_list),
+                '\'' => c_byte_list.clone_from(&byte_list),
+                '"'  => byte_list.clone_from(&c_byte_list),
 
-            '='  => println!("{}", String::from_utf16(&byte_list).unwrap()),
-            '#'  => println!("{:?}", &byte_list),
+                '='  => println!("{}", String::from_utf16(&byte_list).unwrap()),
+                '#'  => println!("{:?}", &byte_list),
 
-            '&'  => println!("{}", index), // Show index
-            '@'  => println!("{}", byte_list[index]), // Show hold value
+                '&'  => println!("{}", index), // Show index
+                '@'  => println!("{}", byte_list[index]), // Show hold value
 
-            '!'  => byte_list[index] = 0,
-            '$'  => byte_list.fill(0),
-            '.'  => index = 0,
+                '!'  => byte_list[index] = 0,
+                '$'  => byte_list.fill(0),
+                '.'  => index = 0,
 
-            '~'  => arr.into_iter().enumerate().for_each(|(i, _c)| c_byte_list[i] = byte_list[INDEX_MAX - i]),
+                '~'  => arr.into_iter().enumerate().for_each(|(i, _c)| c_byte_list[i] = byte_list[INDEX_MAX - i]),
 
-            _    => {
-                // TODO: Make goto up to 31 (maximum)
-                ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].contains(&char).then(|| index = usize::try_from(char.to_digit(10).unwrap()).unwrap());
+                _    => {
+                    // TODO: Make goto up to 31 (maximum)
+                    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].contains(&char).then(|| index = usize::try_from(char.to_digit(10).unwrap()).unwrap());
+                },
+            }
+        }
+        
+        if !line.starts_with("`") { continue; }
+        
+        let line = line.replace("`", "");
+        let mut command: Vec<&str> = line.split_whitespace().collect();
+        
+        match command.remove(0) {
+            "swap" => {
+                if command.len() < 2 { continue; }
+
+                let from = command.get(0).unwrap().to_string().parse::<usize>();
+                let to   = command.get(1).unwrap().to_string().parse::<usize>();
+                
+                match from { Ok(_o) => (), Err(_e) => continue }
+                match to   { Ok(_o) => (), Err(_e) => continue }
+
+                let copy_from = from.unwrap().max(INDEX_MIN);
+                let copy_to   = to.unwrap().min(INDEX_MAX);
+
+                let cached_value = byte_list[copy_from];
+
+                byte_list[copy_from] = byte_list[copy_to];
+                byte_list[copy_to]   = cached_value;
             },
+
+            "rem" => {
+                if command.len() == 0 { continue; }
+
+                let from = command.get(0).unwrap().to_string().parse::<usize>();
+                
+                match from { Ok(_o) => (), Err(_e) => continue }
+                
+                byte_list[from.unwrap().max(INDEX_MIN).min(INDEX_MAX)] = 0;
+            },
+
+            _ => (),
         }
     }
 }
